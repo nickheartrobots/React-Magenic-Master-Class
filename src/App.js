@@ -2,85 +2,46 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-class LastNameInput extends Component {
-	constructor(props){
+import RadioGroup from './Components/RadioGroup';
+import TextInput from './Components/TextInput';
+import CheckboxGroup from './Components/CheckboxGroup';
+
+class App extends Component {
+	constructor(props) {
 		super(props);
-
-		this.state = {
-			lastName: "",
-			placeholder: "Ex: Snow",
-		}
-	}
-	
-	handleChange = (event) => {
-		this.setState({lastName: event.target.value});
-	}
-
-	render(){
-		return <input name="lastName" type="text" onChange={this.handleChange} placeholder={this.state.placeholder} value={this.state.lastName} />;
-	}
-}
-
-class FirstNameInput extends Component {
-	constructor(props){
-		super(props);
-
-		this.state = {
-			firstName: "",
-			placeholder: "Ex: Jon",
-		}
-	}
-	
-	handleChange = (event) => {
-		this.setState({firstName: event.target.value});
-	}
-
-	render(){
-		return <input name="firstName" type="text" onChange={this.handleChange} placeholder={this.state.placeholder} value={this.state.lastName} />;
-	}
-}
-
-class RadioGroup extends Component {
-	constructor(props){
-		super(props);
-
-		const array = ["Cake", "The Letter Q", "Bread", "Robots", "Dr. Pepper"];
+		
+		const stuff = {"groupName": "items1", array: ["Cake", "The Letter Q", "Bread", "Robots", "Dr. Pepper"] };
 		
 		this.state = {
-			array: array,
-			currentlyChecked: array[0]
-		}
-	}
-	
-	handleChange = (event) => {
-		this.setState({ currentlyChecked: event.target.value});
-	}
-
-	render(){
-		return (
-			<div>
-				{this.state.array.map(i => {
-					return (
-						<div key={i}>
-							<input type="radio" name="radioGroup" value={i} onChange={this.handleChange} checked={this.state.currentlyChecked === i ? true : false}/> {i}
-						</div>
-					);
-				})}
-			</div>)
-	}
-}
-
-class CheckboxGroup extends Component {
-	constructor(props){
-		super(props);
-
-		this.state = {
+			lastName: "",
+			firstName: "",
+			items: stuff,
+			radioSelected: stuff.array[0],
 			array: ["Happy", "Angry", "Sad", "Cranky", "Silly", "Wild"],
 			currentlyChecked: [false, false, false, false, false, false]
 		}
 	}
-	
-	handleChange = (event) => {
+
+	handleLastNameChange = (event) => {
+		this.setState({lastName: event.target.value});
+	}
+
+	handleFirstNameChange = (event) => {
+		this.setState({firstName: event.target.value});
+	}
+
+	handleClick = (event) => {
+		event.preventDefault();
+		alert(this.state.radioSelected);
+	}
+
+	handleRadioChange =(event) => {
+		console.log(event.target.value)
+		this.setState({radioSelected: event.target.value});
+		event.preventDefault();
+	}
+
+	handleCheckboxChange = (event) => {
 		// .splice(index, remove one item/old value, new value) creates a new array and toggles the bool of the previous state
 		const i = this.state.array.indexOf(event.target.value);
 		this.setState({currentlyChecked: this.state.currentlyChecked.splice(i, 1, !this.state.currentlyChecked[i])});
@@ -89,36 +50,6 @@ class CheckboxGroup extends Component {
 		// this.setState({ currentlyChecked: this.state.array.map((name) => {
 		// 	return name === event.target.value ? true : false;
 		// })});
-	}
-
-	render(){
-		return (
-			<div>
-				{this.state.array.map(i => {
-					return (
-						<div key={i}>
-							<input type="checkbox" name="checkboxGroup" value={i} onChange={this.handleChange} checked={this.state.currentlyChecked[i]}/> {i}
-						</div>
-					);
-				})}
-			</div>)
-	}
-}
-
-class App extends Component {
-	constructor(props) {
-		super(props);
-		
-		this.state = {
-			lastName: "",
-			firstName: "",
-		}
-	}
-
-
-	handleSubmitClick = (event) => {
-		event.preventDefault();
-		alert("Form Submitted");
 	}
 
 	render() {
@@ -131,24 +62,22 @@ class App extends Component {
 				<form>
 				<h2>Random Survey!</h2>
 				<div>
-					<label htmlFor="firstName">First Name:</label>
-					<FirstNameInput />
-				</div>
-				<div>
 					<label htmlFor="lastName">Last Name:</label>
-					<LastNameInput />
+					<TextInput value={this.state.lastName} name="lastName" placeholder="Ex: Snow" onChange={this.handleLastNameChange}/>
 				</div>
 				<div>
-					<h3>Which is your favorite?</h3>
-					<RadioGroup />
+					<label htmlFor="firstName">First Name:</label>
+					<TextInput value={this.state.firstName} name="firstName" placeholder="Ex: Jon" onChange={this.handleFirstNameChange}/>
+				</div>
+				<div>
+					<h3>Which do you like better?</h3>
+					<RadioGroup groupStuff={this.state.items} onChange={this.handleRadioChange} checked={this.state.radioSelected}/>
 				</div>
 				<div>
 					<h3>Check all that apply:</h3>
-					<CheckboxGroup />
+					<CheckboxGroup array={this.state.array} currentlyChecked={this.state.currentlyChecked} onChange={this.handleCheckboxChange}/>
 				</div>
-				<div>
-					<button onClick={this.handleSubmitClick}>Submit</button>
-				</div>
+				<button onClick={this.handleClick}>Submit</button>
 			</form>
 			</div>
 		);
