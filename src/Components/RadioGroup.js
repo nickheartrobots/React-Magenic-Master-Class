@@ -8,14 +8,15 @@ class RadioGroup extends Component {
     render(){
 		return (
 			<div>
-				{this.props.groupStuff.array.map(i => {
+				{this.props.radios.map(i => {
 					return (
 						<div key={i}>
-							<input type="radio" name={this.props.groupStuff.groupName} value={i} onChange={this.props.onChange} checked={this.props.checked === i ? true : false}/> {i}
+							<input type="radio" value={i} onChange={this.props.onChange} checked={this.props.checked === i ? true : false}/> {i}
 						</div>
 					);
 				})}
-			</div>)
+			</div>
+		)
 	}
 }
 

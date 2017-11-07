@@ -6,24 +6,46 @@ import RadioGroup from './Components/RadioGroup';
 import TextInput from './Components/TextInput';
 import CheckboxGroup from './Components/CheckboxGroup';
 
+class FormValidation extends Component {
+	constructor(props){
+		super(props);
+	}
+
+	render(){
+		return(
+			<div className="Validation">
+				{this.props.formErrors.lastName && <div>{this.props.formErrors.lastName}</div>}
+			</div>
+		)
+	}
+}
+
+
+
+
 class App extends Component {
 	constructor(props) {
 		super(props);
 		
-		const stuff = {"groupName": "items1", array: ["Cake", "The Letter Q", "Bread", "Robots", "Dr. Pepper"] };
+		const stuff = ["Cake", "The Letter Q", "Bread", "Robots", "Dr. Pepper"];
 		
 		this.state = {
 			lastName: "",
 			firstName: "",
 			items: stuff,
-			radioSelected: stuff.array[0],
+			radioSelected: stuff[0],
 			array: ["Happy", "Angry", "Sad", "Cranky", "Silly", "Wild"],
-			currentlyChecked: [false, false, false, false, false, false]
+			currentlyChecked: [false, false, false, false, false, false],
+			formErrors: {
+				lastName: 'asasfa'
+			},
+			showFormErrors: false,
+			formValid: false
 		}
 	}
 
 	handleLastNameChange = (event) => {
-		this.setState({lastName: event.target.value});
+		this.setState({lastName: event.target.value}, this.validateLastName);
 	}
 
 	handleFirstNameChange = (event) => {
@@ -32,24 +54,44 @@ class App extends Component {
 
 	handleClick = (event) => {
 		event.preventDefault();
-		alert(this.state.radioSelected);
+		this.validateForm();
+
+		if(this.state.formValid === true){
+			alert("Valid");
+		} else {
+			alert("Invalid");
+			this.setState({showFormErrors: true});
+		}
 	}
 
-	handleRadioChange =(event) => {
-		console.log(event.target.value)
+	validateLastName = () => {
+		let valid = false;
+		
+		if(this.state.lastName === "Clarity"){
+			this.setState({formValid: true, showFormErrors: false})
+		} else {
+			let newFormErrors = this.state.formErrors;
+			newFormErrors.lastName = 'its broken bitch!'
+			this.setState({formErrors: newFormErrors})
+		}
+
+		return valid;
+	}
+
+	validateForm = () => {
+	}
+
+	handleRadioChange = (event) => {
+		//console.log(`App.js clicked: ${event.target.value}`)
 		this.setState({radioSelected: event.target.value});
-		event.preventDefault();
 	}
 
 	handleCheckboxChange = (event) => {
-		// .splice(index, remove one item/old value, new value) creates a new array and toggles the bool of the previous state
 		const i = this.state.array.indexOf(event.target.value);
-		this.setState({currentlyChecked: this.state.currentlyChecked.splice(i, 1, !this.state.currentlyChecked[i])});
+		const t = this.state.currentlyChecked.slice(0);
+		t.splice(i, 1, !t[i]);
 
-		// .map() array of strings to an array of bools setting to true when value matches 
-		// this.setState({ currentlyChecked: this.state.array.map((name) => {
-		// 	return name === event.target.value ? true : false;
-		// })});
+		this.setState({currentlyChecked: t});
 	}
 
 	render() {
@@ -71,7 +113,7 @@ class App extends Component {
 				</div>
 				<div>
 					<h3>Which do you like better?</h3>
-					<RadioGroup groupStuff={this.state.items} onChange={this.handleRadioChange} checked={this.state.radioSelected}/>
+					<RadioGroup radios={this.state.items} onChange={this.handleRadioChange} checked={this.state.radioSelected}/>
 				</div>
 				<div>
 					<h3>Check all that apply:</h3>
@@ -79,6 +121,7 @@ class App extends Component {
 				</div>
 				<button onClick={this.handleClick}>Submit</button>
 			</form>
+			{false && <FormValidation formErrors={this.state.formErrors}/>}
 			</div>
 		);
 	}

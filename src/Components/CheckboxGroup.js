@@ -8,10 +8,11 @@ class CheckboxGroup extends Component {
     render(){
         return(
             <div>
-                {this.props.array.map(i => {
+                {this.props.array.map((i, index) => {
+                   
                     return (
                         <div key={i}>
-                            <input type="checkbox" name="checkboxGroup" value={i} onChange={this.props.onChange} checked={this.props.currentlyChecked[i]}/> {i}
+                            <input type="checkbox" value={i} onChange={this.props.onChange} checked={this.props.currentlyChecked[i]}/> {i}
                         </div>
                     );
                 })}
