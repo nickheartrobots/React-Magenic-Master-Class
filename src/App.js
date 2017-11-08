@@ -5,23 +5,7 @@ import './App.css';
 import RadioGroup from './Components/RadioGroup';
 import TextInput from './Components/TextInput';
 import CheckboxGroup from './Components/CheckboxGroup';
-
-class FormValidation extends Component {
-	constructor(props){
-		super(props);
-	}
-
-	render(){
-		return(
-			<div className="Validation">
-				{this.props.formErrors.lastName && <div>{this.props.formErrors.lastName}</div>}
-			</div>
-		)
-	}
-}
-
-
-
+import FormValidation from './Components/FormErrors';
 
 class App extends Component {
 	constructor(props) {
@@ -37,10 +21,14 @@ class App extends Component {
 			array: ["Happy", "Angry", "Sad", "Cranky", "Silly", "Wild"],
 			currentlyChecked: [false, false, false, false, false, false],
 			formErrors: {
-				lastName: 'asasfa'
+				lastName: '',
+				firstName: '',
+				checkbox: ''
 			},
+			isLastNameValid: false,
+			isFirstNameValid: false,
+			isCheckboxValid: true,
 			showFormErrors: false,
-			formValid: false
 		}
 	}
 
@@ -48,15 +36,76 @@ class App extends Component {
 		this.setState({lastName: event.target.value}, this.validateLastName);
 	}
 
+	validateLastName = () => {
+		let isValid = false;
+		let newFormErrors = this.state.formErrors;
+
+		if(this.state.lastName === "Snow"){
+			newFormErrors.lastName = ''
+			isValid = true;
+			this.setState({isLastNameValid: isValid, formErrors: newFormErrors})
+		} else {
+			newFormErrors.lastName = 'Try a different Last Name'
+			this.setState({isLastNameValid: isValid, formErrors: newFormErrors})
+		}
+		return isValid;
+	}
+
 	handleFirstNameChange = (event) => {
-		this.setState({firstName: event.target.value});
+		this.setState({firstName: event.target.value}, this.validateFirstName);
+	}
+
+	validateFirstName = () => {
+		let isValid = false;
+		let newFormErrors = this.state.formErrors;
+
+		if(this.state.firstName === "Jon"){
+			newFormErrors.firstName = ''
+			isValid = true;
+			this.setState({isFirstNameValid: isValid, formErrors: newFormErrors})
+		} else {
+			newFormErrors.firstName = 'Try a different First Name'
+			this.setState({isFirstNameValid: isValid, formErrors: newFormErrors})
+		}
+		return isValid;
+	}
+
+	handleRadioChange = (event) => {
+		this.setState({radioSelected: event.target.value});
+	}
+
+	handleCheckboxChange = (event) => {
+		const i = this.state.array.indexOf(event.target.value);
+		//copy full array
+		const temp = this.state.currentlyChecked.slice(0);
+		//insert toggled value
+		temp.splice(i, 1, !temp[i]);
+
+		this.setState({currentlyChecked: temp}, this.validateCheckbox);
+	}
+
+	validateCheckbox = () => {
+		let isValid = false;
+		let newFormErrors = this.state.formErrors;
+
+		//if any of the boxes are checked
+		if(this.state.currentlyChecked.some(b => b)){
+			newFormErrors.checkbox = ''
+			isValid = true;
+			this.setState({isFirstNameValid: isValid, formErrors: newFormErrors})
+		} else {
+			newFormErrors.checkbox = 'Please select at least one Checkbox'
+			this.setState({isCheckboxValid: isValid, formErrors: newFormErrors})
+		}
+
+		console.log(isValid);
+		return isValid;
 	}
 
 	handleClick = (event) => {
 		event.preventDefault();
-		this.validateForm();
 
-		if(this.state.formValid === true){
+		if(this.validateForm()){
 			alert("Valid");
 		} else {
 			alert("Invalid");
@@ -64,34 +113,16 @@ class App extends Component {
 		}
 	}
 
-	validateLastName = () => {
-		let valid = false;
-		
-		if(this.state.lastName === "Clarity"){
-			this.setState({formValid: true, showFormErrors: false})
-		} else {
-			let newFormErrors = this.state.formErrors;
-			newFormErrors.lastName = 'its broken bitch!'
-			this.setState({formErrors: newFormErrors})
+	validateForm = () => {
+		const isLastNameValid = this.validateLastName();
+		const isFirstNameValid = this.validateFirstName();
+		const isCheckboxValid = this.validateCheckbox();
+
+		if(isLastNameValid && isFirstNameValid && isCheckboxValid){
+			return true;
 		}
 
-		return valid;
-	}
-
-	validateForm = () => {
-	}
-
-	handleRadioChange = (event) => {
-		//console.log(`App.js clicked: ${event.target.value}`)
-		this.setState({radioSelected: event.target.value});
-	}
-
-	handleCheckboxChange = (event) => {
-		const i = this.state.array.indexOf(event.target.value);
-		const t = this.state.currentlyChecked.slice(0);
-		t.splice(i, 1, !t[i]);
-
-		this.setState({currentlyChecked: t});
+		return false;
 	}
 
 	render() {
@@ -104,24 +135,31 @@ class App extends Component {
 				<form>
 				<h2>Random Survey!</h2>
 				<div>
-					<label htmlFor="lastName">Last Name:</label>
-					<TextInput value={this.state.lastName} name="lastName" placeholder="Ex: Snow" onChange={this.handleLastNameChange}/>
-				</div>
-				<div>
-					<label htmlFor="firstName">First Name:</label>
-					<TextInput value={this.state.firstName} name="firstName" placeholder="Ex: Jon" onChange={this.handleFirstNameChange}/>
+					<h3>Guess a Name!</h3>
+					<div>
+						<label htmlFor="lastName">Last Name:</label>
+						<TextInput value={this.state.lastName} name="lastName" placeholder="Ex: Snow" onChange={this.handleLastNameChange}/>
+					</div>
+					<div>
+						<label htmlFor="firstName">First Name:</label>
+						<TextInput value={this.state.firstName} name="firstName" placeholder="Ex: Jon" onChange={this.handleFirstNameChange}/>
+					</div>
 				</div>
 				<div>
 					<h3>Which do you like better?</h3>
 					<RadioGroup radios={this.state.items} onChange={this.handleRadioChange} checked={this.state.radioSelected}/>
 				</div>
 				<div>
-					<h3>Check all that apply:</h3>
+					<h3>Select at least One:</h3>
 					<CheckboxGroup array={this.state.array} currentlyChecked={this.state.currentlyChecked} onChange={this.handleCheckboxChange}/>
 				</div>
 				<button onClick={this.handleClick}>Submit</button>
 			</form>
-			{false && <FormValidation formErrors={this.state.formErrors}/>}
+			{(!this.state.isLastNameValid
+				|| !this.state.isFirstNameValid
+				|| !this.state.isCheckboxValid)
+				&& this.state.showFormErrors
+				&& <FormValidation formErrors={this.state.formErrors}/>}
 			</div>
 		);
 	}
